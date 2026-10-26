@@ -14,9 +14,6 @@ except ImportError:  # older calibre only installs _ as a builtin
     pass
 
 from calibre_plugins.send_to_kindle.core.filenames import DEFAULT_TEMPLATE
-from calibre_plugins.send_to_kindle.core.formats import (
-    DEFAULT_FORMAT_ORDER, format_list_to_text, parse_format_list,
-)
 from calibre_plugins.send_to_kindle.core.recipients import is_kindle_address, kindle_accounts
 
 #: Stored in calibre's config directory as plugins/send_to_kindle.json.
@@ -25,8 +22,6 @@ prefs = JSONConfig('plugins/send_to_kindle')
 #: Address to send to. Empty means "the first Kindle address in calibre's
 #: email settings".
 prefs.defaults['kindle_address'] = ''
-#: Formats to try, in order.
-prefs.defaults['formats'] = format_list_to_text(DEFAULT_FORMAT_ORDER)
 #: Calibre template for the attachment filename (and embedded title).
 prefs.defaults['template'] = DEFAULT_TEMPLATE
 #: Write the library's metadata into the copy that is sent.
@@ -66,13 +61,6 @@ class ConfigWidget(QWidget):
         idx = self.address.findData(current)
         self.address.setCurrentIndex(max(idx, 0))
         form.addRow(_('&Send to:'), self.address)
-
-        self.formats = QLineEdit(self)
-        self.formats.setText(format_list_to_text(parse_format_list(prefs['formats'])))
-        self.formats.setToolTip(
-            _('Comma-separated list of formats. The first one the book has '
-              'is sent. Books with none of them are skipped.'))
-        form.addRow(_('&Formats, in order of preference:'), self.formats)
 
         self.template = QLineEdit(self)
         self.template.setText(prefs['template'])
@@ -119,9 +107,6 @@ class ConfigWidget(QWidget):
 
     def validate(self):
         """Check the settings; show an error and return False if invalid."""
-        if not parse_format_list(self.formats.text()):
-            error_dialog(self, _('No formats'), _('You must list at least one format to send.'), show=True)
-            return False
         template = self.template.text().strip()
         if not template:
             error_dialog(self, _('No template'), _('The attachment template cannot be empty.'), show=True)
@@ -136,7 +121,6 @@ class ConfigWidget(QWidget):
 
     def save_settings(self):
         prefs['kindle_address'] = self.address.currentData() or ''
-        prefs['formats'] = format_list_to_text(parse_format_list(self.formats.text()))
         prefs['template'] = self.template.text().strip()
         prefs['embed_metadata'] = self.embed_metadata.isChecked()
         prefs['title_in_metadata'] = self.title_in_metadata.isChecked()
