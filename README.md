@@ -1,18 +1,38 @@
 # Send to Kindle (Calibre plugin)
 
 A calibre toolbar button that emails the selected books to your Kindle's
-Send-to-Kindle address.
+Send-to-Kindle address, named so that series stay in reading order.
 
-Calibre can already do this with **Connect/share → Email to**. This plugin
-renames what it sends. Each attachment is named from a calibre template, and
-by default the same name goes into the book's embedded title. Books in a series
-then show up and sort in reading order on the Kindle:
+## Why this matters
+
+Your Kindle library sorts books by the name they arrive with. If you send a
+series with calibre's built-in **Connect/share → Email to**, each book arrives
+under its own title. The books then sort alphabetically, scattered through
+your library and out of reading order:
 
 ```
-Foundation [01] - Foundation.epub
-Foundation [02] - Foundation and Empire.epub
-Foundation [03] - Second Foundation.epub
+Oathbringer
+The Way of Kings
+Words of Radiance
 ```
+
+This plugin names each book it sends from a calibre template that puts the
+series and its number first. Books in a series then group together and sort
+in reading order:
+
+```
+The Stormlight Archive [01] - The Way of Kings.epub
+The Stormlight Archive [02] - Words of Radiance.epub
+The Stormlight Archive [03] - Oathbringer.epub
+```
+
+The more series you read, the more this matters. Without it, finding the next
+book means remembering its title. With it, the next book sits right after the
+one you just finished.
+
+Amazon takes a book's name from the attachment filename or from the title
+embedded in the EPUB, depending on the file. So by default the plugin puts the
+same name in both places, and the order holds whichever one Amazon uses.
 
 Your library is never changed. Only the temporary copy that is sent gets
 renamed and has its metadata updated.
