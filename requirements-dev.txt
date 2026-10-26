@@ -1,0 +1,2 @@
+# The unit tests only cover core/, which uses the standard library alone,
+# so no third-party packages are needed. Calibre-side code runs inside calibre.
