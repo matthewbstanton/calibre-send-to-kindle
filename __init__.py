@@ -9,7 +9,7 @@ class SendToKindlePlugin(InterfaceActionBase):
     description = ('Email the selected books to your Kindle, naming each attachment '
                    'with a template so series books show and sort in order.')
     supported_platforms = ['windows', 'osx', 'linux']
-    author = 'Matthew'
+    author = 'Matthew Stanton'
     version = (1, 0, 0)
     # 7.0 keeps the attachment name for Kindle addresses in send_mails and
     # ships Qt 6 with the qt.core namespace.
