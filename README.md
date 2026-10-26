@@ -3,6 +3,13 @@
 A calibre toolbar button that emails the selected books to your Kindle's
 Send-to-Kindle address, named so that series stay in reading order.
 
+> **Email is set up in calibre, not in this plugin.** Your SMTP server, your
+> sending address and your Kindle address all live in calibre's built-in
+> **Preferences → Sharing books by email**, the same place calibre's own
+> *Email to* uses. The plugin reads them from there and has no mail settings of
+> its own. If calibre can already email books, the plugin works with no extra
+> setup.
+
 ## Why this matters
 
 Your Kindle library sorts books by the name they arrive with. If you send a
@@ -36,13 +43,6 @@ same name in both places, and the order holds whichever one Amazon uses.
 
 Your library is never changed. Only the temporary copy that is sent gets
 renamed and has its metadata updated.
-
-> **Email is set up in calibre, not in this plugin.** Your SMTP server, your
-> sending address and your Kindle address all live in calibre's built-in
-> **Preferences → Sharing books by email**, the same place calibre's own
-> *Email to* uses. The plugin reads them from there and has no mail settings of
-> its own. If calibre can already email books, the plugin works with no extra
-> setup.
 
 ## Requirements
 
