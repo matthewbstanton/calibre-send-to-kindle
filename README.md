@@ -29,7 +29,12 @@ renamed and has its metadata updated.
 
 1. Select one or more books in the library.
 2. Click **Send to Kindle**, or choose **Send selected books to Kindle** from
-   the button's menu.
+   the button's menu. Both send to the address in the plugin settings.
+
+To send to a different Kindle, open the button's menu and pick
+**Send to <address>**. The menu has one entry for each calibre email account
+at a Kindle domain, and it updates whenever you change calibre's email
+preferences.
 
 For each book the plugin:
 

@@ -2,7 +2,7 @@
 
 from functools import partial
 
-from qt.core import QToolButton
+from qt.core import QAction, QToolButton
 
 from calibre.gui2 import Dispatcher, error_dialog, question_dialog, warning_dialog
 from calibre.gui2.actions import InterfaceAction
@@ -14,7 +14,7 @@ except ImportError:  # older calibre only installs _ as a builtin
 
 from calibre_plugins.send_to_kindle.config import email_accounts, prefs
 from calibre_plugins.send_to_kindle.core.formats import choose_format, parse_format_list
-from calibre_plugins.send_to_kindle.core.recipients import resolve_recipient
+from calibre_plugins.send_to_kindle.core.recipients import kindle_accounts, resolve_recipient
 
 
 class SendToKindleAction(InterfaceAction):
@@ -32,12 +32,30 @@ class SendToKindleAction(InterfaceAction):
         icon = get_icons('images/icon.png', _('Send to Kindle'))
         self.qaction.setIcon(icon)
         self.menuless_qaction.setIcon(icon)
-        self.qaction.triggered.connect(self.send_selected)
+        self.qaction.triggered.connect(lambda checked=False: self.send_selected())
         menu = self.qaction.menu()
-        menu.addSeparator()
+        # One "Send to <address>" entry per Kindle account goes above this
+        # separator, rebuilt each time the menu opens.
+        self.address_actions = []
+        self.address_separator = menu.addSeparator()
+        menu.aboutToShow.connect(self.rebuild_address_actions)
         self.create_menu_action(
             menu, 'send-to-kindle-customize', _('&Customize plugin') + '...',
             icon='config.png', shortcut=False, triggered=self.show_configuration)
+
+    def rebuild_address_actions(self):
+        """Refresh the per-address entries from calibre's current email accounts."""
+        menu = self.qaction.menu()
+        for ac in self.address_actions:
+            menu.removeAction(ac)
+            ac.deleteLater()
+        self.address_actions = []
+        for address in kindle_accounts(email_accounts()):
+            ac = QAction(_('Send to %s') % address, menu)
+            # triggered passes a checked flag, so it lands in the first parameter.
+            ac.triggered.connect(lambda checked=False, address=address: self.send_selected(address))
+            menu.insertAction(self.address_separator, ac)
+            self.address_actions.append(ac)
 
     def location_selected(self, loc):
         self.qaction.setEnabled(loc == 'library')
@@ -51,8 +69,11 @@ class SendToKindleAction(InterfaceAction):
         rows = view.selectionModel().selectedRows()
         return [view.model().id(r) for r in rows]
 
-    def send_selected(self):
-        """Validate the setup, work out what to send, and start the jobs."""
+    def send_selected(self, to=None):
+        """Validate the setup, work out what to send, and start the jobs.
+
+        ``to`` sends to that address instead of the one chosen in the settings.
+        """
         book_ids = self.selected_book_ids()
         if not book_ids:
             return error_dialog(self.gui, _('No books selected'),
@@ -68,7 +89,12 @@ class SendToKindleAction(InterfaceAction):
                 self.open_email_preferences()
             return
 
-        to = resolve_recipient(prefs['kindle_address'], accounts)
+        if to is not None and to not in accounts:
+            return error_dialog(
+                self.gui, _('No Kindle address'),
+                _("%s is no longer one of calibre's email accounts.") % to, show=True)
+        if to is None:
+            to = resolve_recipient(prefs['kindle_address'], accounts)
         if to is None:
             if prefs['kindle_address']:
                 msg = _('The address %s chosen in the Send to Kindle settings is no longer one of '
