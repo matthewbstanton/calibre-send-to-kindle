@@ -13,7 +13,7 @@ except ImportError:  # older calibre only installs _ as a builtin
     pass
 
 from calibre_plugins.send_to_kindle.config import email_accounts, prefs
-from calibre_plugins.send_to_kindle.core.formats import choose_format, parse_format_list
+from calibre_plugins.send_to_kindle.core.formats import SEND_FORMAT, has_send_format
 from calibre_plugins.send_to_kindle.core.recipients import kindle_accounts, resolve_recipient
 
 
@@ -110,13 +110,11 @@ class SendToKindleAction(InterfaceAction):
         from calibre_plugins.send_to_kindle.utils import SendItem, TemplateError, render_template
 
         db = self.gui.current_db.new_api
-        formats = parse_format_list(prefs['formats'])
         template = prefs['template']
         items, skipped = [], []
         for book_id in book_ids:
             mi = db.get_metadata(book_id, get_cover=False)
-            fmt = choose_format(db.formats(book_id), formats)
-            if fmt is None:
+            if not has_send_format(db.formats(book_id)):
                 skipped.append(_('%(title)s (has %(fmts)s)') % dict(
                     title=mi.title, fmts=', '.join(db.formats(book_id)) or _('no formats')))
                 continue
@@ -127,15 +125,15 @@ class SendToKindleAction(InterfaceAction):
                     self.gui, _('Template error'),
                     _('The attachment template failed for "%s". Fix it in the Send to Kindle settings.') % mi.title,
                     det_msg=str(err), show=True)
-            items.append(SendItem(book_id, mi, fmt, rendered))
+            items.append(SendItem(book_id, mi, SEND_FORMAT, rendered))
 
         if items:
             self.start_prepare_job(db, items, to)
         if skipped:
             warning_dialog(
                 self.gui, _('Some books were not sent'),
-                _('%(num)d book(s) have none of the formats %(fmts)s and were skipped. '
-                  'Click "Show details" for the list.') % dict(num=len(skipped), fmts=', '.join(formats)),
+                _('%(num)d book(s) have no %(fmt)s and were skipped. Convert them to %(fmt)s '
+                  'first. Click "Show details" for the list.') % dict(num=len(skipped), fmt=SEND_FORMAT),
                 det_msg='\n'.join(skipped), show=True)
 
     def start_prepare_job(self, db, items, to):

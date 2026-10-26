@@ -13,10 +13,10 @@
   whitespace collapsed. It can go into the sent file's embedded metadata.
 - **Attachment filename**: the rendered title made safe for filenames, plus
   the format's extension.
-- **Preferred formats**: the ordered list of formats to try. The first one a
-  book has is sent.
-- **Skipped book**: a selected book that has none of the preferred formats. It
-  isn't sent, and it's listed in a warning.
+- **Send format**: EPUB, the only format the plugin sends. It isn't
+  configurable.
+- **Skipped book**: a selected book that has no EPUB. It isn't sent, and it's
+  listed in a warning.
 - **Prepare job**: the background job that copies each book's format to a
   temp file named with its attachment filename and updates the copy's
   metadata. When it finishes, calibre's email jobs send the files.

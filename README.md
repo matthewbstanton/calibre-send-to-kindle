@@ -38,9 +38,9 @@ preferences.
 
 For each book the plugin:
 
-1. Picks the first format from your preferred list that the book has.
+1. Checks that the book has an EPUB. Only EPUB is sent.
 2. Evaluates the attachment template for the book.
-3. Copies that format to a temporary file with the new name. By default it
+3. Copies the EPUB to a temporary file with the new name. By default it
    also writes the library metadata and cover into the copy, with the rendered
    template as the title.
 4. Sends the file with calibre's own email jobs.
@@ -57,9 +57,9 @@ list. If sending fails, calibre's usual error dialog appears, with the log.
   email preferences or to pick an address in the plugin settings. This also
   happens when the address chosen in the settings has been removed from
   calibre.
-- **A book has none of the preferred formats:** the other books are still
-  sent, and a warning lists each skipped book along with the formats it does
-  have. The plugin doesn't convert books. Use calibre's Convert first.
+- **A book has no EPUB:** the other books are still sent, and a warning lists
+  each skipped book along with the formats it does have. The plugin doesn't
+  convert books. Use calibre's Convert to make an EPUB first.
 - **A template error:** nothing is sent, and the error is shown so you can
   fix the template.
 - **Embedding metadata fails** (for example, a PDF calibre can't write to):
@@ -73,7 +73,6 @@ or from **Customize plugin…** in the button's menu.
 | Setting | Default | Meaning |
 |---|---|---|
 | Send to | Automatic | One of calibre's email accounts. *Automatic* uses the first account at a Kindle domain (`kindle.com`, `free.kindle.com`, `kindle.cn`, `free.kindle.cn`), preferring the one marked as calibre's default. |
-| Formats, in order of preference | `EPUB, AZW3, MOBI, PDF` | The first format the book has is sent. |
 | Attachment template | `{series:\|\| }{series_index:0>2s\|[\|] - }{title}` | A calibre template, with the full template language. **Edit…** opens calibre's template editor, and **Reset** restores the default. |
 | Update the metadata inside the sent file from the library | On | Writes the library metadata and cover into the copy that is sent, like calibre's own email does. |
 | Use the rendered template as the title inside the sent file | On | Sets the embedded title (and title sort) of the sent copy to the rendered template. This only applies when the previous option is on. |
@@ -116,10 +115,11 @@ show the book's real title and only want the files renamed.
 
 ### Notes on formats
 
-Amazon's Send-to-Kindle service accepts EPUB and PDF, among others. It no
-longer accepts MOBI or AZW3 by email, and it replies with a rejection message
-if you send them. They stay in the default list as a fallback for other
-addresses and older devices. Remove them if you only send to Amazon.
+The plugin only sends EPUB. Amazon's Send-to-Kindle service no longer accepts
+MOBI or AZW3 by email and replies with a rejection message if you send them.
+It does accept some other formats, such as PDF, but EPUB is the one whose
+embedded title the plugin can set reliably. To send another format, use
+calibre's own **Connect/share → Email to**.
 
 Calibre's email code also replaces the subject and body of mail sent to Kindle
 addresses with random English text, because Amazon's service can't handle
